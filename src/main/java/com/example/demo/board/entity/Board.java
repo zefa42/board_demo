@@ -46,6 +46,10 @@ public class Board {
     @Column(nullable = false)
     private String writer;
 
+    //조회수
+    @Column(nullable = false)
+    private int viewCount;
+
     //게시일자
     @Column(nullable = false)
     @CreatedDate
@@ -55,8 +59,14 @@ public class Board {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
+    //글 수정 로직
     public void update(String title, String content) {
         this.title = title;
         this.content = content;
+    }
+
+    //조회수 증가 로직
+    public void increaseViewCount() {
+        this.viewCount++;
     }
 }
