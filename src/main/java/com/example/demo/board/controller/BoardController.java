@@ -34,7 +34,7 @@ public class BoardController {
     @PutMapping("/{id}")
     public ResponseEntity<Void> update(@PathVariable Long id, @RequestBody BoardCreateRequest request) {
         boardService.update(id, request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")
@@ -50,6 +50,7 @@ public class BoardController {
 
     @GetMapping("/{id}")
     public BoardDetailResponse getBoard(@PathVariable Long id) {
+        boardService.increaseView(id);
         return boardService.getBoard(id);
     }
 }
