@@ -1,10 +1,22 @@
 package com.example.demo.excel.util;
 
+import com.example.demo.board.entity.Board;
+import com.example.demo.excel.dto.BoardExportQuery;
+import com.example.demo.excel.repository.BoardRepositoryCustom;
+import java.util.List;
 import org.springframework.stereotype.Component;
 
 @Component
 public class BoardExcelWriter {
+    private final BoardRepositoryCustom boardRepository;
+
+    public BoardExcelWriter(BoardRepositoryCustom boardRepository) {
+        this.boardRepository = boardRepository;
+    }
+
     public void write(Workbook wb) {
+
+
         Sheet sheet = wb.createSheet("Boards");
 
         int rowIdx = 0;
@@ -26,5 +38,28 @@ public class BoardExcelWriter {
         row.createCell(3).setCellValue(0);
         row.createCell(4).setCellValue("2026-01-25T00:00:00");
         row.createCell(5).setCellValue("2026-01-25T00:00:00");
+
+        // 예시: 전체 다운로드 (원하면 Controller에서 query를 받아 넘기도록 변경)
+        BoardExportQuery query = new BoardExportQuery(null, null, null);
+
+        int page = 0;
+        int size = 5000;
+
+        while (true) {
+            int offset = page * size;
+            List<Board> chunk = boardRepository.findChunk(query, offset, size);
+            if (chunk.isEmpty()) break;
+
+            for (Board b : chunk) {
+                Row row = sheet.createRow(rowIdx++);
+                row.createCell(0).setCellValue(b.getId());
+                row.createCell(1).setCellValue(b.getTitle());
+                row.createCell(2).setCellValue(b.getWriter());
+                row.createCell(3).setCellValue(b.getViewCount());
+                row.createCell(4).setCellValue(String.valueOf(b.getCreatedAt()));
+                row.createCell(5).setCellValue(String.valueOf(b.getUpdatedAt()));
+            }
+            page++;
+        }
     }
 }
