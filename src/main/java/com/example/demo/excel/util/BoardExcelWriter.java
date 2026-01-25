@@ -31,13 +31,13 @@ public class BoardExcelWriter {
         header.createCell(5).setCellValue("UpdatedAt");
 
         // 더미 1행(다운로드 연결 확인)
-        Row row = sheet.createRow(rowIdx);
-        row.createCell(0).setCellValue(1L);
-        row.createCell(1).setCellValue("sample title");
-        row.createCell(2).setCellValue("sample writer");
-        row.createCell(3).setCellValue(0);
-        row.createCell(4).setCellValue("2026-01-25T00:00:00");
-        row.createCell(5).setCellValue("2026-01-25T00:00:00");
+//        Row row = sheet.createRow(rowIdx);
+//        row.createCell(0).setCellValue(1L);
+//        row.createCell(1).setCellValue("sample title");
+//        row.createCell(2).setCellValue("sample writer");
+//        row.createCell(3).setCellValue(0);
+//        row.createCell(4).setCellValue("2026-01-25T00:00:00");
+//        row.createCell(5).setCellValue("2026-01-25T00:00:00");
 
         // 예시: 전체 다운로드 (원하면 Controller에서 query를 받아 넘기도록 변경)
         BoardExportQuery query = new BoardExportQuery(null, null, null);
