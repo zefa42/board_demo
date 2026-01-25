@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,6 +19,8 @@ public class ExcelDownloadService {
     private final BoardRepositoryCustom boardRepository;
     private final ExcelDownloadPolicy policy;
     private final ExcelDownloadLimiter limiter;
+
+    private static final Logger log = LoggerFactory.getLogger(ExcelDownloadService.class);
 
     public ExcelDownloadService(BoardExcelWriter boardExcelWriter,
                                 BoardRepositoryCustom boardRepository,
@@ -29,11 +33,14 @@ public class ExcelDownloadService {
     }
 
     public void writeBoardsExcel(OutputStream os) throws IOException {
+        long start = System.currentTimeMillis();
+
         limiter.runWithLimit(() -> {
             BoardExportQuery query = new BoardExportQuery(null, null, null);
 
             long total = boardRepository.countForExport(query);
             if (total > policy.maxRowsXssf()) {
+                log.warn("excel_download boards rejected: total={}", total);
                 throw new IllegalArgumentException("XSSF 처리 시 스레드풀 위험. 범위를 줄여주세요");
             }
 
@@ -42,6 +49,9 @@ public class ExcelDownloadService {
                 wb.write(os);
                 os.flush();
             }
+
+            long ms = System.currentTimeMillis() - start;
+            log.info("excel_download boards success: total={} 소요시간={}", total, ms);
             return null;
         });
     }
