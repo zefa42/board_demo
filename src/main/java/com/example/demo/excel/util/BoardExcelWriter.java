@@ -4,6 +4,9 @@ import com.example.demo.board.entity.Board;
 import com.example.demo.excel.dto.BoardExportQuery;
 import com.example.demo.excel.repository.BoardRepositoryCustom;
 import java.util.List;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.stereotype.Component;
 
 @Component
