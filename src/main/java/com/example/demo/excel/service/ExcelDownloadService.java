@@ -5,10 +5,10 @@ import com.example.demo.excel.repository.BoardRepositoryCustom;
 import com.example.demo.excel.util.BoardExcelWriter;
 import com.example.demo.excel.util.ExcelDownloadLimiter;
 import com.example.demo.excel.util.ExcelDownloadPolicy;
+import com.example.demo.excel.workbook.ExcelWorkbookFactory;
 import java.io.IOException;
 import java.io.OutputStream;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -19,17 +19,20 @@ public class ExcelDownloadService {
     private final BoardRepositoryCustom boardRepository;
     private final ExcelDownloadPolicy policy;
     private final ExcelDownloadLimiter limiter;
+    private final ExcelWorkbookFactory workbookFactory;
 
     private static final Logger log = LoggerFactory.getLogger(ExcelDownloadService.class);
 
     public ExcelDownloadService(BoardExcelWriter boardExcelWriter,
                                 BoardRepositoryCustom boardRepository,
                                 ExcelDownloadPolicy policy,
-                                ExcelDownloadLimiter limiter) {
+                                ExcelDownloadLimiter limiter,
+                                ExcelWorkbookFactory workbookFactory) {
         this.boardExcelWriter = boardExcelWriter;
         this.boardRepository = boardRepository;
         this.policy = policy;
         this.limiter = limiter;
+        this.workbookFactory = workbookFactory;
     }
 
     public void writeBoardsExcel(OutputStream os) throws IOException {
@@ -44,7 +47,7 @@ public class ExcelDownloadService {
                 throw new IllegalArgumentException("XSSF 처리 시 스레드풀 위험. 범위를 줄여주세요");
             }
 
-            try (Workbook wb = new XSSFWorkbook()) {
+            try (Workbook wb = workbookFactory.create()) {
                 boardExcelWriter.write(wb);
                 wb.write(os);
                 os.flush();
