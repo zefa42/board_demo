@@ -12,4 +12,9 @@ public class XssfWorkbookFactory implements ExcelWorkbookFactory {
     public Workbook create() {
         return new XSSFWorkbook();
     }
+
+    @Override
+    public WorkbookType workbookType() {
+        return WorkbookType.XSSF;
+    }
 }

@@ -14,4 +14,9 @@ public class SxssfWorkbookFactory implements ExcelWorkbookFactory {
         wb.setCompressTempFiles(true);
         return wb;
     }
+
+    @Override
+    public WorkbookType workbookType() {
+        return WorkbookType.SXSSF;
+    }
 }

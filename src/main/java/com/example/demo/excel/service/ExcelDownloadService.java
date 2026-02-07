@@ -6,6 +6,7 @@ import com.example.demo.excel.util.BoardExcelWriter;
 import com.example.demo.excel.util.ExcelDownloadLimiter;
 import com.example.demo.excel.util.ExcelDownloadPolicy;
 import com.example.demo.excel.workbook.ExcelWorkbookFactory;
+import com.example.demo.excel.workbook.WorkbookType;
 import java.io.IOException;
 import java.io.OutputStream;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -40,11 +41,15 @@ public class ExcelDownloadService {
 
         limiter.runWithLimit(() -> {
             BoardExportQuery query = new BoardExportQuery(null, null, null);
+            WorkbookType workbookType = workbookFactory.workbookType();
+            int maxRows = policy.maxRows(workbookType);
 
             long total = boardRepository.countForExport(query);
-            if (total > policy.maxRowsXssf()) {
-                log.warn("excel_download boards rejected: total={}", total);
-                throw new IllegalArgumentException("XSSF 처리 시 스레드풀 위험. 범위를 줄여주세요");
+            if (total > maxRows) {
+                log.warn("excel_download boards rejected: type={}, total={}, maxRows={}", workbookType, total, maxRows);
+                throw new IllegalArgumentException(
+                    String.format("엑셀 다운로드 허용 행수(%d건)를 초과했습니다. 조회 범위를 줄여주세요.", maxRows)
+                );
             }
 
             try (Workbook wb = workbookFactory.create()) {
@@ -54,7 +59,7 @@ public class ExcelDownloadService {
             }
 
             long ms = System.currentTimeMillis() - start;
-            log.info("excel_download boards success: total={} 소요시간={}", total, ms);
+            log.info("excel_download boards success: type={}, total={}, elapsedMs={}", workbookType, total, ms);
             return null;
         });
     }
