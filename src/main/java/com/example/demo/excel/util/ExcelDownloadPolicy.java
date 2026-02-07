@@ -1,17 +1,26 @@
 package com.example.demo.excel.util;
 
 import com.example.demo.excel.workbook.WorkbookType;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ExcelDownloadPolicy {
-    private static final int MAX_ROWS_XSSF = 30_000;
-    private static final int MAX_ROWS_SXSSF = 300_000;
+    private final int maxRowsXssf;
+    private final int maxRowsSxssf;
+
+    public ExcelDownloadPolicy(
+        @Value("${excel.download.max-rows.xssf:30000}") int maxRowsXssf,
+        @Value("${excel.download.max-rows.sxssf:300000}") int maxRowsSxssf
+    ) {
+        this.maxRowsXssf = maxRowsXssf;
+        this.maxRowsSxssf = maxRowsSxssf;
+    }
 
     public int maxRows(WorkbookType workbookType) {
         return switch (workbookType) {
-            case XSSF -> MAX_ROWS_XSSF;
-            case SXSSF -> MAX_ROWS_SXSSF;
+            case XSSF -> maxRowsXssf;
+            case SXSSF -> maxRowsSxssf;
         };
     }
 }

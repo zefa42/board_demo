@@ -19,6 +19,7 @@ Apache POI 기반이며 기본은 **XSSFWorkbook**, 프로파일로 **SXSSFWorkb
 - 실행 로그 기록
 - Workbook 생성 책임 분리 (`ExcelWorkbookFactory`)
 - 프로파일 기반 XSSF/SXSSF 전환
+- 행수 제한 정책 외부화 (`application.properties`)
 
 ---
 
@@ -30,7 +31,7 @@ Apache POI 기반이며 기본은 **XSSFWorkbook**, 프로파일로 **SXSSFWorkb
 | `ExcelDownloadService` | Workbook 생성 및 응답 스트림 write |
 | `BoardExcelWriter` | 시트/행/셀 작성 및 데이터 기록 |
 | `BoardRepositoryCustom` | 엑셀용 chunk 조회 / count 조회 |
-| `ExcelDownloadPolicy` | Workbook 타입별 최대 행수 제한 |
+| `ExcelDownloadPolicy` | Workbook 타입별 최대 행수 제한 정책 |
 | `ExcelDownloadLimiter` | 동시 다운로드 제한 |
 | `ExcelWorkbookFactory` | Workbook 생성 추상화 |
 | `WorkbookType` | Workbook 타입 구분 (`XSSF`, `SXSSF`) |
@@ -150,6 +151,17 @@ MAX_CONCURRENT_DOWNLOADS = 3
 
 ---
 
+## 설정
+
+- 행수 제한 값은 `application.properties`에서 관리
+
+```properties
+excel.download.max-rows.xssf=30000
+excel.download.max-rows.sxssf=300000
+```
+
+---
+
 ## 실행 방법
 
 - 기본 (XSSF 사용)
@@ -161,8 +173,9 @@ MAX_CONCURRENT_DOWNLOADS = 3
 
 ## 향후 개선 계획
 
+- 프로파일별 정책 검증 테스트 추가
 - 다운로드 파일명/헤더 표준화
 - 대용량 다운로드 UX 개선
 - 비동기 엑셀 생성 방식 검토
 
-> 현재 상태는 **WorkbookFactory 적용 + XSSF/SXSSF 전환 + 타입별 행수 제한** 상태.
+> 현재 상태는 **WorkbookFactory 적용 + XSSF/SXSSF 전환 + 타입별 행수 제한 + 정책 외부화** 상태.
