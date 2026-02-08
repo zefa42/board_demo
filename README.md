@@ -20,6 +20,7 @@ Apache POI 기반이며 기본은 **XSSFWorkbook**, 프로파일로 **SXSSFWorkb
 - Workbook 생성 책임 분리 (`ExcelWorkbookFactory`)
 - 프로파일 기반 XSSF/SXSSF 전환
 - 행수 제한 정책 외부화 (`application.properties`)
+- 프로파일별 정책/팩토리 테스트 코드 추가
 
 ---
 
@@ -162,6 +163,18 @@ excel.download.max-rows.sxssf=300000
 
 ---
 
+## 테스트
+
+- `ExcelDownloadPolicyTest`
+- 설정값 주입 시 `WorkbookType.XSSF/SXSSF`별 제한값 검증
+- 설정 미지정 시 기본값(`30000`, `300000`) 검증
+
+- `ExcelWorkbookFactoryProfileTest`
+- 기본 프로파일에서 `XssfWorkbookFactory` 주입 검증
+- `excel-sxssf` 프로파일에서 `SxssfWorkbookFactory` 주입 검증
+
+---
+
 ## 실행 방법
 
 - 기본 (XSSF 사용)
@@ -173,9 +186,8 @@ excel.download.max-rows.sxssf=300000
 
 ## 향후 개선 계획
 
-- 프로파일별 정책 검증 테스트 추가
 - 다운로드 파일명/헤더 표준화
 - 대용량 다운로드 UX 개선
 - 비동기 엑셀 생성 방식 검토
 
-> 현재 상태는 **WorkbookFactory 적용 + XSSF/SXSSF 전환 + 타입별 행수 제한 + 정책 외부화** 상태.
+> 현재 상태는 **WorkbookFactory 적용 + XSSF/SXSSF 전환 + 타입별 행수 제한 + 정책 외부화 + 정책 테스트 추가** 상태.
