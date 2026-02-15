@@ -21,6 +21,7 @@ Apache POI 기반이며 기본은 **XSSFWorkbook**, 프로파일로 **SXSSFWorkb
 - 프로파일 기반 XSSF/SXSSF 전환
 - 행수 제한 정책 외부화 (`application.properties`)
 - 프로파일별 정책/팩토리 테스트 코드 추가
+- 엑셀 다운로드 예외 응답 표준화 (`@RestControllerAdvice`)
 
 ---
 
@@ -38,6 +39,7 @@ Apache POI 기반이며 기본은 **XSSFWorkbook**, 프로파일로 **SXSSFWorkb
 | `WorkbookType` | Workbook 타입 구분 (`XSSF`, `SXSSF`) |
 | `XssfWorkbookFactory` | 기본(XSSF) Workbook 생성 |
 | `SxssfWorkbookFactory` | 스트리밍(SXSSF) Workbook 생성 |
+| `ExcelDownloadExceptionHandler` | 엑셀 다운로드 예외 응답 표준화 |
 
 ---
 
@@ -119,6 +121,23 @@ MAX_CONCURRENT_DOWNLOADS = 3
 
 ---
 
+### 예외 응답 표준화
+
+- 행수 제한 초과: `400 Bad Request`
+- 동시 다운로드 제한 초과: `429 Too Many Requests`
+- 응답 포맷: `code`, `message`, `path`, `timestamp`
+
+```json
+{
+  "code": "EXCEL_ROW_LIMIT_EXCEEDED",
+  "message": "엑셀 다운로드 허용 행수(30000건)를 초과했습니다. 조회 범위를 줄여주세요.",
+  "path": "/excel/boards",
+  "timestamp": "2026-02-15T21:00:00"
+}
+```
+
+---
+
 ### 로그
 
 - Workbook 타입
@@ -173,6 +192,10 @@ excel.download.max-rows.sxssf=300000
 - 기본 프로파일에서 `XssfWorkbookFactory` 주입 검증
 - `excel-sxssf` 프로파일에서 `SxssfWorkbookFactory` 주입 검증
 
+- `ExcelDownloadExceptionHandlerTest`
+- 행수 제한 초과 시 `400` / 코드 `EXCEL_ROW_LIMIT_EXCEEDED` 검증
+- 동시성 제한 초과 시 `429` / 코드 `EXCEL_CONCURRENCY_LIMIT_EXCEEDED` 검증
+
 ---
 
 ## 실행 방법
@@ -190,4 +213,4 @@ excel.download.max-rows.sxssf=300000
 - 대용량 다운로드 UX 개선
 - 비동기 엑셀 생성 방식 검토
 
-> 현재 상태는 **WorkbookFactory 적용 + XSSF/SXSSF 전환 + 타입별 행수 제한 + 정책 외부화 + 정책 테스트 추가** 상태.
+> 현재 상태는 **WorkbookFactory 적용 + XSSF/SXSSF 전환 + 타입별 행수 제한 + 정책 외부화 + 정책 테스트 추가 + 예외 응답 표준화** 상태.

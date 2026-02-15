@@ -1,5 +1,6 @@
 package com.example.demo.excel.util;
 
+import com.example.demo.excel.exception.ExcelDownloadConcurrencyLimitExceededException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Semaphore;
 import org.springframework.stereotype.Component;
@@ -11,7 +12,7 @@ public class ExcelDownloadLimiter {
     public <T> T runWithLimit(Callable<T> task) {
         boolean acquired = semaphore.tryAcquire();
         if (!acquired) {
-            throw new IllegalStateException("Too many concurrent downloads. Try again later.");
+            throw new ExcelDownloadConcurrencyLimitExceededException("동시 다운로드 요청이 많습니다. 잠시 후 다시 시도해주세요.");
         }
         try {
             return task.call();

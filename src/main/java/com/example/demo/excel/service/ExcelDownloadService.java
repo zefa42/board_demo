@@ -1,6 +1,7 @@
 package com.example.demo.excel.service;
 
 import com.example.demo.excel.dto.BoardExportQuery;
+import com.example.demo.excel.exception.ExcelDownloadRowLimitExceededException;
 import com.example.demo.excel.repository.BoardRepositoryCustom;
 import com.example.demo.excel.util.BoardExcelWriter;
 import com.example.demo.excel.util.ExcelDownloadLimiter;
@@ -47,7 +48,7 @@ public class ExcelDownloadService {
             long total = boardRepository.countForExport(query);
             if (total > maxRows) {
                 log.warn("excel_download boards rejected: type={}, total={}, maxRows={}", workbookType, total, maxRows);
-                throw new IllegalArgumentException(
+                throw new ExcelDownloadRowLimitExceededException(
                     String.format("엑셀 다운로드 허용 행수(%d건)를 초과했습니다. 조회 범위를 줄여주세요.", maxRows)
                 );
             }
