@@ -22,6 +22,7 @@ Apache POI 기반이며 기본은 **XSSFWorkbook**, 프로파일로 **SXSSFWorkb
 - 행수 제한 정책 외부화 (`application.properties`)
 - 프로파일별 정책/팩토리 테스트 코드 추가
 - 엑셀 다운로드 예외 응답 표준화 (`@RestControllerAdvice`)
+- 다운로드 파일명/헤더 표준화 (`filename`, `filename*`)
 
 ---
 
@@ -29,7 +30,7 @@ Apache POI 기반이며 기본은 **XSSFWorkbook**, 프로파일로 **SXSSFWorkb
 
 | 클래스 | 역할 |
 | --- | --- |
-| `ExcelDownloadController` | 엑셀 다운로드 API |
+| `ExcelDownloadController` | 엑셀 다운로드 API 및 응답 헤더 설정 |
 | `ExcelDownloadService` | Workbook 생성 및 응답 스트림 write |
 | `BoardExcelWriter` | 시트/행/셀 작성 및 데이터 기록 |
 | `BoardRepositoryCustom` | 엑셀용 chunk 조회 / count 조회 |
@@ -121,6 +122,18 @@ MAX_CONCURRENT_DOWNLOADS = 3
 
 ---
 
+### 다운로드 헤더 표준화
+
+- `Content-Disposition`에 `filename` + `filename*` 동시 설정
+- ASCII fallback 파일명과 UTF-8 인코딩 파일명을 함께 제공
+- 한글/공백 파일명 호환성 개선
+
+```http
+Content-Disposition: attachment; filename="boards.xlsx"; filename*=UTF-8''%EA%B2%8C%EC%8B%9C%EA%B8%80%20%EB%AA%A9%EB%A1%9D.xlsx
+```
+
+---
+
 ### 예외 응답 표준화
 
 - 행수 제한 초과: `400 Bad Request`
@@ -132,7 +145,7 @@ MAX_CONCURRENT_DOWNLOADS = 3
   "code": "EXCEL_ROW_LIMIT_EXCEEDED",
   "message": "엑셀 다운로드 허용 행수(30000건)를 초과했습니다. 조회 범위를 줄여주세요.",
   "path": "/excel/boards",
-  "timestamp": "2026-02-15T21:00:00"
+  "timestamp": "2026-03-02T12:00:00"
 }
 ```
 
@@ -209,8 +222,8 @@ excel.download.max-rows.sxssf=300000
 
 ## 향후 개선 계획
 
-- 다운로드 파일명/헤더 표준화
+- 다운로드 조건 파라미터화
 - 대용량 다운로드 UX 개선
 - 비동기 엑셀 생성 방식 검토
 
-> 현재 상태는 **WorkbookFactory 적용 + XSSF/SXSSF 전환 + 타입별 행수 제한 + 정책 외부화 + 정책 테스트 추가 + 예외 응답 표준화** 상태.
+> 현재 상태는 **WorkbookFactory 적용 + XSSF/SXSSF 전환 + 타입별 행수 제한 + 정책 외부화 + 정책 테스트 추가 + 예외 응답 표준화 + 파일명/헤더 표준화** 상태.
